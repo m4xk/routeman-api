@@ -57,8 +57,6 @@ func main() {
 
 	readConfig()
 
-	fmt.Printf("%v+", config)
-
 	router := mux.NewRouter()
 
 	router.Use(authMiddleware)
