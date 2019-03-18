@@ -22,9 +22,9 @@ type Gateway struct {
 }
 
 type Config struct {
-	Listen    string
-	AllowedIp string
-	Gateways  []Gateway
+	Listen     string
+	AllowedIps []string
+	Gateways   []Gateway
 }
 
 type Response struct {
@@ -54,7 +54,6 @@ func readConfig() {
 }
 
 func main() {
-
 	readConfig()
 
 	router := mux.NewRouter()
@@ -74,11 +73,15 @@ func authMiddleware(next http.Handler) http.Handler {
 
 		slice := strings.Split(r.RemoteAddr, ":")
 
-		if slice[0] == config.AllowedIp {
-			next.ServeHTTP(w, r)
-		} else {
-			http.Error(w, "Forbidden", http.StatusForbidden)
+		for _, v := range config.AllowedIps {
+			if v == slice[0] {
+				next.ServeHTTP(w, r)
+
+				return
+			}
 		}
+
+		http.Error(w, "Forbidden", http.StatusForbidden)
 	})
 }
 
